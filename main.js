@@ -5,6 +5,7 @@ const profanity = require('@2toad/profanity').profanity;
 const songsNameMap = {};
 const auth = require('./auth.js');
 const songsFolder = auth.songDirectory;
+
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: false,
@@ -12,7 +13,11 @@ let options  = {
         testOption: true,
         cmndPrefix: "!"
 }
+let  commandList = {
+        "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command",
+        "song": "Prints a list of available songs"
 
+}
 client.once('ready', () => {
 	console.log('Ready!');
         indexSongs();
@@ -32,9 +37,24 @@ client.on('message', message => {
         console.log(message.content);
         handlePingPong(message);
         handleHiIAm(message);
-
+        handleHelp(message);
         handleAudio(message);
 });
+function handleHelp(message){
+        let cmd = options.cmndPrefix;
+        let helptext = "```diff\n Welcome to NedaBot help! Here are a list of commands:\n\n";
+        for(let key in  commandList){
+                if(commandList.hasOwnProperty(key)){
+                        helptext += options.cmndPrefix +  key +"\n";
+                        helptext += "\t" + commandList[key] + "\n\n";
+                }
+        }
+        helptext += "!options\n\tUsed to get a list of the options and instructions for setting them\n```"
+        if(message.content == options.cmndPrefix + "help"){
+                message.channel.send(helptext);
+        }
+
+}
 function indexSongs(){
         fs.readdir(songsFolder, (err, files) => {
                 files.forEach((file, i) => {
