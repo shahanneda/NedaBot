@@ -34,8 +34,13 @@ function handleOptions(message){
                 let arr = formatedMsg.split(" ");        
 
                 if(arr.length == 1){
+                        let listOfOptions = "";
                         for(let option in options){
+                                if(options.hasOwnProperty(option)){
+                                        listOfOptions += option + ": " + options[option] + "\n";
+                                }
                         }
+                        message.channel.send("Welcome to NedaBot Options!\nHere is list of options and their current values:\n" + listOfOptions + "In order to set them run the following command with the following format \n!options optionName value option2Name value2 option3Nane value3 ..."); 
                 }
 
                 for(var i =1; i < arr.length; i+=2){
