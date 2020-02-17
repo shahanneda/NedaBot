@@ -1,11 +1,6 @@
-// require the discord.js module
 const Discord = require('discord.js');
-
-// create a new Discord client
 const client = new Discord.Client();
 
-// when the client is ready, run this code
-// this event will only trigger one time after logging in
 client.once('ready', () => {
 	console.log('Ready!');
 });
@@ -16,15 +11,15 @@ client.on('message', message => {
         }
 
         console.log(message.content);
-
         handlePingPong(message);
-        handleHiIAm(message, messageArray);
+        handleHiIAm(message);
 });
 
 
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 function handlePingPong(message){
         let formatedMsg = message.content.toLowerCase();
+
         if ( formatedMsg == 'ping') {
               message.channel.send('pong');
         }
@@ -35,11 +30,17 @@ function handlePingPong(message){
 }
 
 function handleHiIAm(message){
-
+        let formatedMsg = message.content.toLowerCase();
         let messageArray = formatedMsg.split(" ");
-        if( messageArray.indexOf("im") != -1){
-                messageArray.slcie
-        }
+        
+        let triggerPhrases = ["im", "i'm", "i am", "i am a", "im a"];
+
+        triggerPhrases.map(function (phrase, index){
+                if( messageArray.indexOf("im") != -1){
+                        messageArray = messageArray.slice(messageArray.indexOf("im"), messageArray.length);
+                        console.log(messageArray);
+                }
+        });
 
         let name  = "";
         if(messageArray[0] == 'im' && messageArray[1] == "a"){
