@@ -11,50 +11,58 @@ client.once('ready', () => {
 });
 
 client.on('message', message => {
+        if(message.author.id === client.user.id) {
+                return;// to prevent endless loop
+        }
 
-        if(message.author.id === client.user.id) return;
         console.log(message.content);
-        let formatedMsg = message.content.toLowerCase();
 
+        handlePingPong(message);
+        handleHiIAm(message, messageArray);
+});
+
+
+client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
+function handlePingPong(message){
+        let formatedMsg = message.content.toLowerCase();
         if ( formatedMsg == 'ping') {
               message.channel.send('pong');
         }
-
         if (formatedMsg ===  "pong"){
-                message.channel.send("go die");
+                message.channel.send("ping");
         }
 
+}
+
+function handleHiIAm(message){
+
         let messageArray = formatedMsg.split(" ");
-        console.log(messageArray[0]);
+        if( messageArray.indexOf("im") != -1){
+                messageArray.slcie
+        }
+
         let name  = "";
         if(messageArray[0] == 'im' && messageArray[1] == "a"){
                 name = messageArray[2];
-                name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
-                message.channel.send("Hi "  +  name +"!\nI am NedaBot!");
+                sendHiMessage(message, name);
         }else
         if(messageArray[0] ==  'im' || messageArray[0] == "i'm"){
                 name = messageArray[1];   
-                name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
-                message.channel.send("Hi "  +  name +"!\nI am NedaBot");
+                sendHiMessage(message, name);
         }else
         if(messageArray[0] == 'i' && messageArray[1] == "am" && messageArray[2] == "a"){
                 name = messageArray[3];
-                name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
-                message.channel.send("Hi "  +  name +"!\nI am NedaBot!");
+                sendHiMessage(message, name);
         }else
         if(messageArray[0] == 'i' && messageArray[1] == "am"){
                 name = messageArray[2];
-                name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
-                message.channel.send("Hi "  +  name +"!\nI am NedaBot!");
+                sendHiMessage(message, name);
         }
-
-
-});
-// login to Discord with your app's token
-//
-
-client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
-
+}
+function sendHiMessage(messageObject, name){
+        name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
+        messageObject.channel.send("Hi "  +  name +"!\nI am NedaBot!");
+}
 function setCharAt(str,index,chr) {
     if(index > str.length-1) return str;
     return str.substr(0,index) + chr + str.substr(index+1);
