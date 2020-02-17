@@ -32,7 +32,7 @@ function handlePingPong(message){
 function handleHiIAm(message){
         let formatedMsg = message.content.toLowerCase();
         
-        let triggerPhrases = ["im", "i'm", "i am", "i am a", "im a"];
+        let triggerPhrases = ["im", "i'm", "i am", "i am a", "im a", "i'm a", "im so", "i'm so", "i am so"];
 
         triggerPhrases.map(function (phrase, index){
                 if(formatedMsg.indexOf(phrase) != -1){
@@ -41,10 +41,6 @@ function handleHiIAm(message){
                         sendHiMessage(message, rname[0]);
                 }
         });
-
-        let messageArray = formatedMsg.split(" ");
-
-        let name  = "";
 }
 function sendHiMessage(messageObject, name){
         name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
