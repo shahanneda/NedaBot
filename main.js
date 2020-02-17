@@ -1,6 +1,9 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const fs = require('fs');
 const profanity = require('@2toad/profanity').profanity;
+const songsFolder = '/Users/shahan/Documents/Website Projects/NedaBot/songs/';
+
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: false,
@@ -31,22 +34,29 @@ client.on('message', message => {
 });
 
 function handleAudio(message){
-          if (message.content === '/join') {
+        if(message.content === 'nb songs'){
+                let text = "Here is a list of available songs:\n";
+                fs.readdir(songsFolder, (err, files) => {
+                        files.forEach(file => {
+                                text += file;
+                        });
+                }); 
+        }
+        if (message.content === 'nb join') {
 
             if (message.member.voiceChannel) {
               message.member.voiceChannel.join()
                 .then(connection => {
-                  message.reply('I have successfully connected to the channel!');
-                        const dispatcher = connection.playFile('/Users/shahan/Documents/Website Projects/NedaBot/songs/chopin.mp3');
-
+                  message.reply('I have connected to the voice Channel');
+                createAudioDispatcher(connection);
                 })
                 .catch(console.log);
             } else {
               message.reply('You need to join a voice channel first!');
             }
           }
-        
-          if (message.content === '/leave') {
+
+       if (message.content === 'nb leave') {
             if (message.member.voiceChannel) {
                 message.member.voiceChannel.leave()
                 message.reply('I have left the voice channel');
@@ -58,6 +68,22 @@ function handleAudio(message){
 
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 
+function createAudioDispatcher(connection){
+        var dispatcher = connection.playFile(songsFolder + 'chopin.mp3');
+
+        dispatcher.on('end', () => {
+                dispatcher = connection.playFile(songsFolder + "chopin.mp3");
+        });
+
+        dispatcher.on('error', e => {
+                console.log(e);
+        });
+
+        dispatcher.setVolume(0.5);
+        dispatcher.setVolume(1); 
+
+        console.log(dispatcher.time);
+}
 function handleOptions(message){
         let formatedMsg = message.content;
         if(formatedMsg.indexOf("!options") != -1){
