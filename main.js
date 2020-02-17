@@ -26,8 +26,35 @@ client.on('message', message => {
         console.log(message.content);
         handlePingPong(message);
         handleHiIAm(message);
+
+        handleAudio(message);
 });
 
+function handleAudio(message){
+          if (message.content === '/join') {
+
+            if (message.member.voiceChannel) {
+              message.member.voiceChannel.join()
+                .then(connection => {
+                  message.reply('I have successfully connected to the channel!');
+                        const dispatcher = connection.playFile('/Users/shahan/Documents/Website Projects/NedaBot/songs/chopin.mp3');
+
+                })
+                .catch(console.log);
+            } else {
+              message.reply('You need to join a voice channel first!');
+            }
+          }
+        
+          if (message.content === '/leave') {
+            if (message.member.voiceChannel) {
+                message.member.voiceChannel.leave()
+                message.reply('I have left the voice channel');
+            } else {
+              message.reply('You need to join a voice channel first!');
+            }
+          }
+}
 
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 
@@ -84,7 +111,7 @@ function handlePingPong(message){
 function handleHiIAm(message){
         let formatedMsg = message.content.toLowerCase();
         
-        let triggerPhrases = ["im ", "i'm ", "i am ", "i am a ", "im a ", "i'm a ", "im so ", "i'm so ", "i am so ", "i am a complete ", "im a complete ","i'm a complete ", "im an " , "i am an " , "i'm an "];
+        let triggerPhrases = ["im ", "i'm ","i’m ", "i am ", "i am a ", "im a ", "i'm a ", "i’m a " , "im so ", "i'm so ", "i’m so ", "i am so ", "i am a complete ", "im a complete ","i'm a complete ", "i’m a complete ", "im an " , "i am an " , "i'm an ", "i’m an "];
 
         triggerPhrases.reverse();
         triggerPhrases.map(function (phrase, index){
