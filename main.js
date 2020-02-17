@@ -43,7 +43,7 @@ function handleOptions(message){
                                         listOfOptions += option + ": " + options[option] + "\n";
                                 }
                         }
-                        message.channel.send("```diff\nWelcome to NedaBot Options!\nHere is list of options and their current values:\n\n" + listOfOptions + "\nIn order to set them run the following command with the following format \n!options optionName value option2Name value2 option3Nane value3 ...```"); 
+                        message.channel.send("```diff\nWelcome to NedaBot Options!\nHere is list of options and their current values:\n\n" + listOfOptions + "\nIn order to set them run the following command with the following format: \n!options optionName value option2Name value2 option3Name value3 ...```"); 
                 }
 
                 for(var i =1; i < arr.length; i+=2){
