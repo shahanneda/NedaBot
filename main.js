@@ -13,11 +13,13 @@ let options  = {
         testOption: true,
         cmndPrefix: "!"
 }
+let songVolume = 1;
 let  commandList = {
         "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command.",
         "leave": "Leaves the current voice channel. Before running this command first join the intended voice channel yourself.",
         "song": "Prints a list of available songs.",
         "song num": "Where num is the number of song you want to play. Used to play a song, to get a list of number run the previous command. For example to play song 3, run !song 3",
+        "volume num":"Sets the volume of the song, must be a value between 1-100",
 
 }
 client.once('ready', () => {
@@ -41,6 +43,7 @@ client.on('message', message => {
         handleHiIAm(message);
         handleHelp(message);
         handleAudio(message);
+        handleVolume(message);
 });
 function handleHelp(message){
         let cmd = options.cmndPrefix;
@@ -117,6 +120,23 @@ function handleAudio(message){
 
 client.login(auth.key);
 
+function handleVolume(message){
+        if(message.content.indexOf(options.cmndPrefix + "volume") != -1){
+                let usrVol = ( parseFloat(message.content.split(" ")[1]) / (100* 1.0)); 
+                let volume =  usrVol > 1 ? 1 : (usrVol < 0 ? 0 : usrVol) ;
+                console.log(volume);
+                let clientVoiceConnection =message.guild.voiceConnection;
+                songVolume = volume;
+
+                if(!clientVoiceConnection){
+                        sendMessage(message, "You need to first connect to a channel and play music before changing the volume! Join the channel yourself, then type " + options.cmndPrefix + "join")
+                        return
+                }
+                if(clientVoiceConnection.dispatcher){
+                        clientVoiceConnection.dispatcher.setVolume(volume);
+                }
+        }
+}
 function playSong(message, songName){
         let clientVoiceConnection =message.guild.voiceConnection;
         if(!clientVoiceConnection){
@@ -125,9 +145,11 @@ function playSong(message, songName){
         }
         if(clientVoiceConnection.dispatcher){
                 clientVoiceConnection.dispatcher.end();
+
         }
         console.log("Playing song with songname " + songName);
         createAudioDispatcher(clientVoiceConnection, songName);
+        clientVoiceConnection.dispatcher.setVolume(songVolume);
 }
 
 function createAudioDispatcher(connection, songName){
