@@ -49,6 +49,7 @@ function handleOptions(message){
                 for(var i =1; i < arr.length; i+=2){
                         let option = arr[i];
                         console.log("Triggering options " + option);
+                        let found = false;
                         if(option in options){// check if options exist
                                 let userValue = arr[i+1];
                                 if(userValue == "true" || userValue=="false"){
@@ -57,8 +58,12 @@ function handleOptions(message){
                                 options[option] = userValue;
                                 message.channel.send("Set option " + option + " to value: " + userValue); 
 
-
+                                found = true;
                         }
+                        if(!found){
+                                message.channel.send("Option not found!");
+                        }
+                        
 
                 }
         }
