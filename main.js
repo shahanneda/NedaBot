@@ -2,9 +2,9 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const fs = require('fs');
 const profanity = require('@2toad/profanity').profanity;
-const songsFolder = '/Users/shahan/Documents/Website Projects/NedaBot/songs/';
 const songsNameMap = {};
 const auth = require('./auth.js');
+const songsFolder = auth.songDirectory;
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: false,
@@ -98,7 +98,7 @@ client.login(auth.key);
 function playSong(message, songName){
         let clientVoiceConnection =message.guild.voiceConnection;
         if(!clientVoiceConnection){
-                message.channel.send("You need to first connect to a channel. Join the channel yourself, then type " + cmndPrefix + "join");
+                message.channel.send("You need to first connect to a channel. Join the channel yourself, then type " + options.cmndPrefix + "join")
                 return
         }
         if(clientVoiceConnection.dispatcher){
