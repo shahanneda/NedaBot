@@ -1,6 +1,9 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const profanity = require('@2toad/profanity').profanity;
+let options  = {
+        sayEntirePhrase: true;
+}
 
 client.once('ready', () => {
 	console.log('Ready!');
@@ -16,6 +19,7 @@ client.on('message', message => {
                 return
         }
 
+        handleOptions(message);
         console.log(message.content);
         handlePingPong(message);
         handleHiIAm(message);
@@ -23,6 +27,21 @@ client.on('message', message => {
 
 
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
+
+function handleOptions(message){
+        let formatedMsg = message.content.toLowerCase();
+        if(formatedMsg.indexOf("!options") != -1){
+                let arr = formatedMsg.split(" ");        
+                for(var i =1; i<arr.length; i+=2){
+                        let option = arr[i];
+                        if(option in options){// check if options exist
+                                
+                        }
+
+                }
+        }
+}
+
 function handlePingPong(message){
         let formatedMsg = message.content.toLowerCase();
 
@@ -38,17 +57,22 @@ function handlePingPong(message){
 function handleHiIAm(message){
         let formatedMsg = message.content.toLowerCase();
         
-        let triggerPhrases = ["im ", "i'm ", "i am ", "i am a ", "im a ", "i'm a ", "im so ", "i'm so ", "i am so ", "i am a complete ", "im a complete ","i'm a complete " ];
+        let triggerPhrases = ["im ", "i'm ", "i am ", "i am a ", "im a ", "i'm a ", "im so ", "i'm so ", "i am so ", "i am a complete ", "im a complete ","i'm a complete ", "im an " , "i am an " , "i'm an "];
 
         triggerPhrases.reverse();
         triggerPhrases.map(function (phrase, index){
                 if(formatedMsg.indexOf(phrase) != -1){
-                        formatedMsg = formatedMsg.substr(formatedMsg.indexOf(phrase) + phrase.length+1, formatedMsg.length);
+                        formatedMsg = formatedMsg.substr(formatedMsg.indexOf(phrase) + phrase.length, formatedMsg.length);
                         console.log(formatedMsg + " " + phrase);
                         
                         rname = formatedMsg.split(" ");
                         console.log(rname);
-                        sendHiMessage(message, rname[0]);
+                        if(options.sayEntirePhrase){
+                                sendHiMessage(message, formatedMsg);
+                        }
+                        else{
+                                sendHiMessage(message, formatedMsg.split(" ")[0]);
+                        }
                         formatedMsg = "";
                 }
         });
