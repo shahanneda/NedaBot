@@ -13,6 +13,7 @@ let options  = {
 
 client.once('ready', () => {
 	console.log('Ready!');
+        indexSongs();
 });
 
 client.on('message', message => {
@@ -32,6 +33,13 @@ client.on('message', message => {
 
         handleAudio(message);
 });
+function indexSongs(){
+        fs.readdir(songsFolder, (err, files) => {
+                files.forEach((file, i) => {
+                        songsNameMap[i+1] = file;
+                });
+        }); 
+}
 //var  globalConnection = null;
 function handleAudio(message){
         if(message.content === 'nb song'){
@@ -53,7 +61,7 @@ function handleAudio(message){
                 let songName  = songsNameMap[indexOfSong];
                 console.log("song name:" + songName);
 
-                playSong(message, "chopin.mp3"); 
+                playSong(message,songName ); 
         }
         if (message.content === 'nb join') {
 
@@ -93,7 +101,8 @@ function playSong(message, songName){
         if(clientVoiceConnection.dispatcher){
                 clientVoiceConnection.dispatcher.end();
         }
-        createAudioDispatcher(clientVoiceConnection, "chopin.mp3");
+        console.log("Playing song with songname " + songName);
+        createAudioDispatcher(clientVoiceConnection, songName);
 }
 
 function createAudioDispatcher(connection, songName){
