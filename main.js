@@ -32,7 +32,7 @@ client.on('message', message => {
 
         handleAudio(message);
 });
-var  globalConnection= null;
+//var  globalConnection = null;
 function handleAudio(message){
         if(message.content === 'nb song'){
                 fs.readdir(songsFolder, (err, files) => {
@@ -49,9 +49,11 @@ function handleAudio(message){
                 }); 
         }else if(message.content.indexOf('nb song') != -1){
                 let indexOfSong = message.content.substr(message.content.indexOf('nb song') + 7,  message.content.length);
-                let songName  = songsNameMap[parseInt(indexOfSong)];
-                console.log(songName);
-               createAudioDispatcher(globalConnection, songName);
+                indexOfSong = parseInt(indexOfSong);
+                let songName  = songsNameMap[indexOfSong];
+                console.log("song name:" + songName);
+
+                playSong(message, "chopin.mp3"); 
         }
         if (message.content === 'nb join') {
 
@@ -59,8 +61,10 @@ function handleAudio(message){
               message.member.voiceChannel.join()
                 .then(connection => {
                   message.reply('I have connected to the voice Channel');
-                createAudioDispatcher(connection);
-                        globalConnection = connection;
+                         //createAudioDispatcher(connection);
+                        //
+                        playSong(message,"chopin.mp3");
+                       // globalConnection = connection;
                 })
                 .catch(console.log);
             } else {
@@ -80,9 +84,20 @@ function handleAudio(message){
 
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 
-function createAudioDispatcher(connection, songName){
-        var dispatcher = connection.playFile(songsFolder + 'chopin.mp3');
+function playSong(message, songName){
+        let clientVoiceConnection =message.guild.voiceConnection;
+        if(!clientVoiceConnection){
+                message.channel.send("You need to first connect to a chanel. Join the channel yourself, then type nb join");
+                return
+        }
+        if(clientVoiceConnection.dispatcher){
+                clientVoiceConnection.dispatcher.end();
+        }
+        createAudioDispatcher(clientVoiceConnection, "chopin.mp3");
+}
 
+function createAudioDispatcher(connection, songName){
+        var dispatcher = connection.playFile(songsFolder + songName);
         dispatcher.on('end', () => {
                 dispatcher = connection.playFile(songsFolder + songName);
         });
