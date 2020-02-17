@@ -2,7 +2,10 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const profanity = require('@2toad/profanity').profanity;
 let options  = {
-        sayEntirePhrase: true
+        sayEntirePhrase: true,
+        profanityAllowed: false,
+        testOption: false,
+        testOption: true
 }
 
 client.once('ready', () => {
@@ -13,7 +16,7 @@ client.on('message', message => {
         if(message.author.id === client.user.id) {
                 return;// to prevent endless loop
         }
-        if(profanity.exists(message.content.toLowerCase())){
+        if(options.profanityAllowed == false &&  profanity.exists(message.content.toLowerCase())){
                 message.channel.send("😡😡😡 HEY!! " + message.author.toString() + "!! Watch your language!!! 😡😡😡");
                 message.delete(); 
                 return
@@ -40,7 +43,7 @@ function handleOptions(message){
                                         listOfOptions += option + ": " + options[option] + "\n";
                                 }
                         }
-                        message.channel.send("Welcome to NedaBot Options!\nHere is list of options and their current values:\n" + listOfOptions + "In order to set them run the following command with the following format \n!options optionName value option2Name value2 option3Nane value3 ..."); 
+                        message.channel.send("```diff\nWelcome to NedaBot Options!\nHere is list of options and their current values:\n\n" + listOfOptions + "\nIn order to set them run the following command with the following format \n!options optionName value option2Name value2 option3Nane value3 ...```"); 
                 }
 
                 for(var i =1; i < arr.length; i+=2){
@@ -53,6 +56,7 @@ function handleOptions(message){
                                 }
                                 options[option] = userValue;
                                 message.channel.send("Set option " + option + " to value: " + userValue); 
+
 
                         }
 
