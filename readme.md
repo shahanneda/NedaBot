@@ -16,6 +16,6 @@
   
 * **Dynamic Options system**
   * run `!options` so see the options control panel with a list of available options
-  * run `!options optionName` value to set the value of any of the options 
+  * run `!options optionName value` to set the value of any of the options 
 
 #### In order to run the bot, fill in authExample.js with you songs directory and api key, and rename it to auth.js
