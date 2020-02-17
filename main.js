@@ -4,11 +4,13 @@ const fs = require('fs');
 const profanity = require('@2toad/profanity').profanity;
 const songsFolder = '/Users/shahan/Documents/Website Projects/NedaBot/songs/';
 const songsNameMap = {};
+const auth = require('./auth.js');
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: false,
         testOption: false,
-        testOption: true
+        testOption: true,
+        cmndPrefix: "!"
 }
 
 client.once('ready', () => {
@@ -42,7 +44,7 @@ function indexSongs(){
 }
 //var  globalConnection = null;
 function handleAudio(message){
-        if(message.content === 'nb song' || message.content === 'nb songs'){
+        if(message.content === options.cmndPrefix + 'song' || message.content === options.cmndPrefix + 'songs'){
                 fs.readdir(songsFolder, (err, files) => {
                         let text = "Here is a list of available songs:\n\n";
         
@@ -55,8 +57,8 @@ function handleAudio(message){
 
                         message.channel.send(text + "\nPlay a song by typing:\nnb song num\nWhere num is the number of the song.");
                 }); 
-        }else if(message.content.indexOf('nb song') != -1){
-                let indexOfSong = message.content.substr(message.content.indexOf('nb song') + 7,  message.content.length);
+        }else if(message.content.indexOf(options.cmndPrefix + 'song') != -1){
+                let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'song') + 4 + options.cmndPrefix.length ,  message.content.length);
                 indexOfSong = parseInt(indexOfSong);
                 let songName  = songsNameMap[indexOfSong];
                 message.channel.send("Playing " + songName);
@@ -64,7 +66,7 @@ function handleAudio(message){
 
                 playSong(message,songName ); 
         }
-        if (message.content === 'nb join') {
+        if (message.content === options.cmndPrefix + 'join') {
 
             if (message.member.voiceChannel) {
               message.member.voiceChannel.join()
@@ -81,7 +83,7 @@ function handleAudio(message){
             }
           }
 
-       if (message.content === 'nb leave') {
+       if (message.content === options.cmndPrefix + 'leave') {
             if (message.member.voiceChannel) {
                 message.member.voiceChannel.leave()
                 message.reply('I have left the voice channel');
@@ -91,12 +93,12 @@ function handleAudio(message){
           }
 }
 
-client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
+client.login(auth.key);
 
 function playSong(message, songName){
         let clientVoiceConnection =message.guild.voiceConnection;
         if(!clientVoiceConnection){
-                message.channel.send("You need to first connect to a channel. Join the channel yourself, then type nb join");
+                message.channel.send("You need to first connect to a channel. Join the channel yourself, then type " + cmndPrefix + "join");
                 return
         }
         if(clientVoiceConnection.dispatcher){
