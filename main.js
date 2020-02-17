@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const profanity = require('@2toad/profanity').profanity;
 let options  = {
-        sayEntirePhrase: true;
+        sayEntirePhrase: true
 }
 
 client.once('ready', () => {
@@ -29,13 +29,26 @@ client.on('message', message => {
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 
 function handleOptions(message){
-        let formatedMsg = message.content.toLowerCase();
+        let formatedMsg = message.content;
         if(formatedMsg.indexOf("!options") != -1){
                 let arr = formatedMsg.split(" ");        
-                for(var i =1; i<arr.length; i+=2){
+
+                if(arr.length == 1){
+                        for(let option in options){
+                        }
+                }
+
+                for(var i =1; i < arr.length; i+=2){
                         let option = arr[i];
+                        console.log("Triggering options " + option);
                         if(option in options){// check if options exist
-                                
+                                let userValue = arr[i+1];
+                                if(userValue == "true" || userValue=="false"){
+                                        userValue = (userValue == "true")
+                                }
+                                options[option] = userValue;
+                                message.channel.send("Set option " + option + " to value: " + userValue); 
+
                         }
 
                 }
