@@ -42,7 +42,7 @@ function indexSongs(){
 }
 //var  globalConnection = null;
 function handleAudio(message){
-        if(message.content === 'nb song'){
+        if(message.content === 'nb song' || message.content === 'nb songs'){
                 fs.readdir(songsFolder, (err, files) => {
                         let text = "Here is a list of available songs:\n\n";
         
@@ -59,6 +59,7 @@ function handleAudio(message){
                 let indexOfSong = message.content.substr(message.content.indexOf('nb song') + 7,  message.content.length);
                 indexOfSong = parseInt(indexOfSong);
                 let songName  = songsNameMap[indexOfSong];
+                message.channel.send("Playing " + songName);
                 console.log("song name:" + songName);
 
                 playSong(message,songName ); 
@@ -95,7 +96,7 @@ client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 function playSong(message, songName){
         let clientVoiceConnection =message.guild.voiceConnection;
         if(!clientVoiceConnection){
-                message.channel.send("You need to first connect to a chanel. Join the channel yourself, then type nb join");
+                message.channel.send("You need to first connect to a channel. Join the channel yourself, then type nb join");
                 return
         }
         if(clientVoiceConnection.dispatcher){
