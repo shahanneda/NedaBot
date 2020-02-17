@@ -14,8 +14,10 @@ let options  = {
         cmndPrefix: "!"
 }
 let  commandList = {
-        "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command",
-        "song": "Prints a list of available songs"
+        "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command.",
+        "leave": "Leaves the current voice channel. Before running this command first join the intended voice channel yourself.",
+        "song": "Prints a list of available songs.",
+        "song num": "Where num is the number of song you want to play. Used to play a song, to get a list of number run the previous command. For example to play song 3, run !song 3",
 
 }
 client.once('ready', () => {
@@ -66,7 +68,7 @@ function indexSongs(){
 function handleAudio(message){
         if(message.content === options.cmndPrefix + 'song' || message.content === options.cmndPrefix + 'songs'){
                 fs.readdir(songsFolder, (err, files) => {
-                        let text = "Here is a list of available songs:\n\n";
+                        let text = "```diff\nHere is a list of available songs:\n\n";
         
                         files.forEach((file, i) => {
 
@@ -75,13 +77,13 @@ function handleAudio(message){
 
                         });
 
-                        message.channel.send(text + "\nPlay a song by typing:\nnb song num\nWhere num is the number of the song.");
+                        message.channel.send(text + "\nPlay a song by typing:\n" + options.cmndPrefix + "song num\nWhere num is the number of the song.```");
                 }); 
         }else if(message.content.indexOf(options.cmndPrefix + 'song') != -1){
                 let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'song') + 4 + options.cmndPrefix.length ,  message.content.length);
                 indexOfSong = parseInt(indexOfSong);
                 let songName  = songsNameMap[indexOfSong];
-                message.channel.send("Playing " + songName);
+                sendMessage(message, "Playing " + songName);
                 console.log("song name:" + songName);
 
                 playSong(message,songName ); 
@@ -91,7 +93,7 @@ function handleAudio(message){
             if (message.member.voiceChannel) {
               message.member.voiceChannel.join()
                 .then(connection => {
-                  message.reply('I have connected to the voice Channel');
+                  sendMessage(message, 'I have connected to the voice Channel');
                          //createAudioDispatcher(connection);
                         //
                         playSong(message,"chopin.mp3");
@@ -99,16 +101,16 @@ function handleAudio(message){
                 })
                 .catch(console.log);
             } else {
-              message.reply('You need to join a voice channel first!');
+              sendMessage(message,'You need to join a voice channel first!');
             }
           }
 
        if (message.content === options.cmndPrefix + 'leave') {
             if (message.member.voiceChannel) {
                 message.member.voiceChannel.leave()
-                message.reply('I have left the voice channel');
+                sendMessage(message,'I have left the voice channel');
             } else {
-              message.reply('You need to join a voice channel first!');
+              sendMessage(message,'You need to join a voice channel first!');
             }
           }
 }
@@ -118,7 +120,7 @@ client.login(auth.key);
 function playSong(message, songName){
         let clientVoiceConnection =message.guild.voiceConnection;
         if(!clientVoiceConnection){
-                message.channel.send("You need to first connect to a channel. Join the channel yourself, then type " + options.cmndPrefix + "join")
+                sendMessage(message, "You need to first connect to a channel. Join the channel yourself, then type " + options.cmndPrefix + "join")
                 return
         }
         if(clientVoiceConnection.dispatcher){
@@ -143,6 +145,9 @@ function createAudioDispatcher(connection, songName){
 
         console.log(dispatcher.time);
 }
+function sendMessage(message, msg){
+        message.channel.send("```css\n" + msg + "```");
+}
 function handleOptions(message){
         let formatedMsg = message.content;
         if(formatedMsg.indexOf("!options") != -1){
@@ -155,7 +160,7 @@ function handleOptions(message){
                                         listOfOptions += option + ": " + options[option] + "\n";
                                 }
                         }
-                        message.channel.send("```diff\nWelcome to NedaBot Options!\nHere is list of options and their current values:\n\n" + listOfOptions + "\nIn order to set them run the following command with the following format: \n!options optionName value option2Name value2 option3Name value3 ...```"); 
+                        message.channel.send("```diff\nWelcome to NedaBot Options!\nHere is list of options and their current values:\n\n" + listOfOptions + "\nIn order to set them run the following command with the following format: \n!options optionName value option2Name value2 option3Name value3 ...\nFor example to set profanityAllowed to false, run !options profanityAllowed false```"); 
                 }
 
                 for(var i =1; i < arr.length; i+=2){
@@ -168,12 +173,12 @@ function handleOptions(message){
                                         userValue = (userValue == "true")
                                 }
                                 options[option] = userValue;
-                                message.channel.send("Set option " + option + " to value: " + userValue); 
+                                sendMessage(message, "Set option " + option + " to value: " + userValue); 
 
                                 found = true;
                         }
                         if(!found){
-                                message.channel.send("Option not found!");
+                                sendMessage(message, "Option not found!");
                         }
                         
 
