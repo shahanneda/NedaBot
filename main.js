@@ -3,7 +3,7 @@ const client = new Discord.Client();
 const fs = require('fs');
 const profanity = require('@2toad/profanity').profanity;
 const songsFolder = '/Users/shahan/Documents/Website Projects/NedaBot/songs/';
-
+const songsNameMap = {};
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: false,
@@ -32,15 +32,26 @@ client.on('message', message => {
 
         handleAudio(message);
 });
-
+var  globalConnection= null;
 function handleAudio(message){
-        if(message.content === 'nb songs'){
-                let text = "Here is a list of available songs:\n";
+        if(message.content === 'nb song'){
                 fs.readdir(songsFolder, (err, files) => {
-                        files.forEach(file => {
-                                text += file;
+                        let text = "Here is a list of available songs:\n\n";
+        
+                        files.forEach((file, i) => {
+
+                                text += (i+1) + ") " + file + "\n";
+                                songsNameMap[i+1] = file;
+
                         });
+
+                        message.channel.send(text + "\nPlay a song by typing:\nnb song num\nWhere num is the number of the song.");
                 }); 
+        }else if(message.content.indexOf('nb song') != -1){
+                let indexOfSong = message.content.substr(message.content.indexOf('nb song') + 7,  message.content.length);
+                let songName  = songsNameMap[parseInt(indexOfSong)];
+                console.log(songName);
+               createAudioDispatcher(globalConnection, songName);
         }
         if (message.content === 'nb join') {
 
@@ -49,6 +60,7 @@ function handleAudio(message){
                 .then(connection => {
                   message.reply('I have connected to the voice Channel');
                 createAudioDispatcher(connection);
+                        globalConnection = connection;
                 })
                 .catch(console.log);
             } else {
@@ -68,11 +80,11 @@ function handleAudio(message){
 
 client.login('Njc4NzM3NDI2MDkyMzkyNDc2.XknJlw.iywsTAgpty_Em2jpVSLJ2svDFx8');
 
-function createAudioDispatcher(connection){
+function createAudioDispatcher(connection, songName){
         var dispatcher = connection.playFile(songsFolder + 'chopin.mp3');
 
         dispatcher.on('end', () => {
-                dispatcher = connection.playFile(songsFolder + "chopin.mp3");
+                dispatcher = connection.playFile(songsFolder + songName);
         });
 
         dispatcher.on('error', e => {
