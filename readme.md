@@ -9,7 +9,7 @@
   *  This bot looks for its songs in the songs directory set in the auth file
   
   
-*  Unique easter eggs such as
+* Unique easter eggs such as
   * Try introducing yourself
   * Try playing ping pong
   
