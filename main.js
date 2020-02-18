@@ -5,6 +5,8 @@ const profanity = require('@2toad/profanity').profanity;
 const songsNameMap = {};
 const auth = require('./auth.js');
 const songsFolder = auth.songDirectory;
+const ytdl = require('ytdl-core');
+const request = require('request');
 
 let options  = {
         sayEntirePhrase: true,
@@ -19,7 +21,7 @@ let  commandList = {
         "leave": "Leaves the current voice channel. Before running this command first join the intended voice channel yourself.",
         "song": "Prints a list of available songs.",
         "song num": "Where num is the number of song you want to play. Used to play a song, to get a list of number run the previous command. For example to play song 3, run !song 3",
-        "volume num":"Sets the volume of the song, must be a value between 1-100",
+        "volume num":"Sets the volume of the song. Number must be a value between 1-100. Can also use shorthand of just vol.",
 
 }
 client.once('ready', () => {
@@ -83,13 +85,24 @@ function handleAudio(message){
                         message.channel.send(text + "\nPlay a song by typing:\n" + options.cmndPrefix + "song num\nWhere num is the number of the song.```");
                 }); 
         }else if(message.content.indexOf(options.cmndPrefix + 'song') != -1){
-                let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'song') + 4 + options.cmndPrefix.length ,  message.content.length);
-                indexOfSong = parseInt(indexOfSong);
-                let songName  = songsNameMap[indexOfSong];
-                sendMessage(message, "Playing " + songName);
-                console.log("song name:" + songName);
 
-                playSong(message,songName ); 
+                let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'song') + 4 + options.cmndPrefix.length ,  message.content.length);
+                if(!isNaN(indexOfSong)){
+                        indexOfSong = parseInt(indexOfSong);
+                        let songName  = songsNameMap[indexOfSong];
+                        sendMessage(message, "Playing " + songName);
+                        console.log("song name:" + songName);
+
+                        playSong(message,songName ); 
+                }
+                if(indexOfSong.indexOf('youtube.com') !=  -1){
+                        playSongUrl(message, indexOfSong);
+                        request('https://noembed.com/embed?url=' + indexOfSong, { json: true }, (err, res, body) => {
+                                if (err) { return console.log(err); }
+                                console.log(body.title);
+                                sendMessage(message, "Playing: " + body.title);
+                        });
+                }
         }
         if (message.content === options.cmndPrefix + 'join') {
 
@@ -121,7 +134,7 @@ function handleAudio(message){
 client.login(auth.key);
 
 function handleVolume(message){
-        if(message.content.indexOf(options.cmndPrefix + "volume") != -1){
+        if(message.content.indexOf(options.cmndPrefix + "vol") != -1){
                 let usrVol = ( parseFloat(message.content.split(" ")[1]) / (100* 1.0)); 
                 let volume =  usrVol > 1 ? 1 : (usrVol < 0 ? 0 : usrVol) ;
                 console.log(volume);
@@ -138,6 +151,7 @@ function handleVolume(message){
         }
 }
 function playSong(message, songName){
+
         let clientVoiceConnection =message.guild.voiceConnection;
         if(!clientVoiceConnection){
                 sendMessage(message, "You need to first connect to a channel. Join the channel yourself, then type " + options.cmndPrefix + "join")
@@ -147,11 +161,34 @@ function playSong(message, songName){
                 clientVoiceConnection.dispatcher.end();
 
         }
+
+
         console.log("Playing song with songname " + songName);
         createAudioDispatcher(clientVoiceConnection, songName);
         clientVoiceConnection.dispatcher.setVolume(songVolume);
 }
 
+function playSongUrl(message, url){
+
+        let clientVoiceConnection =message.guild.voiceConnection;
+        if(!clientVoiceConnection){
+                sendMessage(message, "You need to first connect to a channel. Join the channel yourself, then type " + options.cmndPrefix + "join")
+                return
+        }
+
+        if(clientVoiceConnection.dispatcher){
+                clientVoiceConnection.dispatcher.end();
+        }
+
+        const stream = ytdl(url, { filter : 'audioonly' });
+        console.log("Playing song with url " + url);
+        createAudioDispatcherFromStream(clientVoiceConnection, stream);
+        clientVoiceConnection.dispatcher.setVolume(songVolume);
+}
+
+function createAudioDispatcherFromStream(connection, stream){
+        var dispatcher = connection.playStream(stream);
+}
 function createAudioDispatcher(connection, songName){
         var dispatcher = connection.playFile(songsFolder + songName);
         dispatcher.on('end', () => {
@@ -172,7 +209,7 @@ function sendMessage(message, msg){
 }
 function handleOptions(message){
         let formatedMsg = message.content;
-        if(formatedMsg.indexOf("!options") != -1){
+        if(formatedMsg.indexOf("!options") != -1 || formatedMsg.indexOf(options.cmndPrefix + "options" ) != -1){
                 let arr = formatedMsg.split(" ");        
 
                 if(arr.length == 1){
