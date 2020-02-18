@@ -19,7 +19,9 @@ let songVolume = 1;
 let  commandList = {
         "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command.",
         "leave": "Leaves the current voice channel. Before running this command first join the intended voice channel yourself.",
-        "song": "Prints a list of available songs.",
+        "song": "Prints a list of available songs on disk",
+        "song searchPhrase": "Searches for a song and plays the first result on youtube",
+        "next": "Skips to the next song out of the results",
         "song num": "Where num is the number of song you want to play. Used to play a song, to get a list of number run the previous command. For example to play song 3, run !song 3",
         "volume num":"Sets the volume of the song. Number must be a value between 1-100. Can also use shorthand of just vol.",
 
@@ -143,8 +145,8 @@ function handleNextSong(message){
                 lastIndex++;
                 if(lastIndex > 9){
                         lastIndex = 0;
-                        ytSearchForSong(message,lastStr);
                 }
+                ytSearchForSong(message,lastStr);
         }
 }
 function ytSearchForSong(message, str){
