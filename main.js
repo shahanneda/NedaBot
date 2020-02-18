@@ -105,8 +105,10 @@ function handleAudio(message){
                                 console.log(body.title);
                                 sendMessage(message, "Playing: " + body.title);
                         });
+                }else{
+                        console.log("this got ran");
+                        ytSearchForSong(message, indexOfSong); 
                 }
-                ytSearchForSong(message, indexOfSong); 
         }
         if (message.content === options.cmndPrefix + 'join') {
 
