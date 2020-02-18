@@ -46,6 +46,7 @@ client.on('message', message => {
         handleHelp(message);
         handleAudio(message);
         handleVolume(message);
+        handleNextSong(message);
 });
 function handleHelp(message){
         let cmd = options.cmndPrefix;
@@ -94,7 +95,7 @@ function handleAudio(message){
                         console.log("song name:" + songName);
 
                         playSong(message,songName ); 
-                }
+                }else
                 if(indexOfSong.indexOf('youtube.com') !=  -1){
                         playSongUrl(message, indexOfSong);
                         request('https://noembed.com/embed?url=' + indexOfSong, { json: true }, (err, res, body) => {
@@ -103,6 +104,7 @@ function handleAudio(message){
                                 sendMessage(message, "Playing: " + body.title);
                         });
                 }
+                ytSearchForSong(message, indexOfSong); 
         }
         if (message.content === options.cmndPrefix + 'join') {
 
@@ -132,7 +134,46 @@ function handleAudio(message){
 }
 
 client.login(auth.key);
+var lastIndex = 0;
+var lastStr = "";
+function handleNextSong(message){
+        if(message.content.indexOf(options.cmndPrefix + "next") != -1){
+                
+                console.log("got here");
+                lastIndex++;
+                if(lastIndex > 9){
+                        lastIndex = 0;
+                        ytSearchForSong(message,lastStr);
+                }
+        }
+}
+function ytSearchForSong(message, str){
+        lastStr = str;
+        const ytsr = require('ytsr');
+        let filter;
 
+        ytsr.getFilters(str, function(err, filters) {// this is from ytsr documatiotion
+          if(err) throw err;
+            filter = filters.get('Type').find(o => o.name === 'Video');
+          ytsr.getFilters(filter.ref, function(err, filters) {
+                    if(err) throw err;
+                    //filter = filters.get('Duration').find(o => o.name.startsWith('Short'));
+                    var options = {
+                        limit: 10,
+                        nextpageRef: filter.ref,
+                    }
+                    ytsr(null, options, function(err, searchResults) {
+                        if(err) throw err;
+                        let link = searchResults.items[lastIndex].link;
+                            console.log(link);
+
+                            sendMessage(message, "Playing " + searchResults.items[lastIndex].title);
+                        playSongUrl(message, link);
+                    });
+            });
+        });
+
+}
 function handleVolume(message){
         if(message.content.indexOf(options.cmndPrefix + "vol") != -1){
                 let usrVol = ( parseFloat(message.content.split(" ")[1]) / (100* 1.0)); 
