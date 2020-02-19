@@ -7,7 +7,7 @@ const auth = require('./auth.js');
 const songsFolder = auth.songDirectory;
 const ytdl = require('ytdl-core');
 const request = require('request');
-
+const ytsr = require('ytsr');
 
 let options  = {
         sayEntirePhrase: true,
@@ -20,8 +20,12 @@ let songVolume = 1;
 let  commandList = {
         "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command.",
         "leave": "Leaves the current voice channel. Before running this command first join the intended voice channel yourself.",
-        "play <search phrase or url>": "Either searches for phrase on youtube and picks first result, or plays the url. If you want the next result use the next command.",
-        "next": "Skips to the next song out of the results",
+        "play <search phrase or url>": "If phrase empty it plays next song in queue. After either searches for phrase on youtube and picks first result, or plays the url. If you want the next result use the next command.",
+        "next": "Skips to the next song out of the results when using play command",
+        "add <search  phrase>": "Searches on youtube and adds first result to queue.",
+        "queue":"Lists all the songs currently in the queue",
+        "clear":"Clears the queue",
+        "skip":"Skips to the next song in the queue",
         "volume num":"Sets the volume of the song. Number must be a value between 1-100. Can also use shorthand of just vol.",
 
 }
@@ -72,6 +76,9 @@ function handleQueue(message){
                 let searchp = message.content.substr(message.content.indexOf(options.cmndPrefix+"add") + options.cmndPrefix.length + 3, message.content.length);
                 ytSearchForSong(message, searchp, true);
         }
+        if(message.content.indexOf(cmndPrefix + "clear") != -1){
+                sendMessage("Cleared the queue! Add new songs using " + cmndPrefix + "add <search phrase> command!";
+        }
 }
 function addToQueue(message, song){
         sendMessage(message, "Added song:\n" + song.title + " to queue position " + (queue.length+1));
@@ -102,7 +109,8 @@ function indexSongs(){
 //var  globalConnection = null;
 function handleAudio(message){
         if(message.content.indexOf(options.cmndPrefix + 'song') != -1 || message.content === options.cmndPrefix + 'songs' || message.content == options.cmndPrefix + 'play'){
-                sendMessage(message, "Play a song by using the command: " +  options.cmndPrefix + "play <search phrase or here>, for example to play all star from youtube the command is: " + options.cmndPrefix + "play allstar smash mouth \nUse "+options.cmndPrefix + "next to advance to the next search result.");
+                sendMessage(message, "Add a song to the queue using " + options.cmndPrefix + "add <search phrase>\n\nCan also directly play a song by using the command: " +  options.cmndPrefix + "play <search phrase or here>, for example to play all star from youtube the command is: " + options.cmndPrefix + "play allstar smash mouth \nUse "+options.cmndPrefix + "next to advance to the next search result.");
+                nextSongFromQueue(message);
         }else if(message.content.indexOf(options.cmndPrefix + 'play') != -1){
 
                 let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'play') + 4 + options.cmndPrefix.length ,  message.content.length);
@@ -170,7 +178,6 @@ function handleNextSong(message){
 }
 function ytSearchForSong(message, str, isQueue){
         lastStr = str;
-        const ytsr = require('ytsr');
         let filter;
 
         ytsr.getFilters(str, function(err, filters) {// this is from ytsr documatiotion
@@ -259,27 +266,30 @@ function playSongUrl(message, url){
         clientVoiceConnection.dispatcher.setVolume(songVolume);
 }
 function nextSongFromQueue(message){
+        console.log("Gpoing to next song in quque");
         console.log(queue);
-        console.log(queue.length);
-        if(queue.length > 0){
+
+        if(queue.length > 0 && queue[0] !== undefined){
                 playSongUrl(message, queue[0].url);
                 sendMessage(message, "Playing next song from queue: " + queue[0].title);
+                let song = queue.shift();
         }
         else{
                 sendMessage(message, "Your queue is empty!! Add songs with !add <search phrase>");
         }
-        let song = queue.shift();
 
 }
-var lastEndTime = Date.now();
+var lastEndTime = new Date().getTime();
 function createAudioDispatcherFromStream(message, connection, stream){
         var dispatcher = connection.playStream(stream);
         dispatcher.on('end', () => {
-                console.log("Last end: " + lastEndTime);
-                lastEndTime = Date.now();
+                sendMessage(message, "SONG ENDED");
+                console.log("Last end: " + ( new Date().getTime() -  lastEndTime));
+                lastEndTime = new Date().getTime();
                 console.log(stream + "" + connection);
-                
-      //          nextSongFromQueue(message);
+               if(lastEndTime > 50){
+//                        nextSongFromQueue(message);
+               }
         });
 }
 function createAudioDispatcher(connection, songName){
