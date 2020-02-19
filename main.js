@@ -8,6 +8,7 @@ const songsFolder = auth.songDirectory;
 const ytdl = require('ytdl-core');
 const request = require('request');
 
+
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: false,
@@ -19,13 +20,12 @@ let songVolume = 1;
 let  commandList = {
         "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command.",
         "leave": "Leaves the current voice channel. Before running this command first join the intended voice channel yourself.",
-        "song": "Prints a list of available songs on disk",
-        "song searchPhrase": "Where searchPhrase is your search phrase. Searches for a song and plays the first result on youtube",
+        "play <search phrase or url>": "Either searches for phrase on youtube and picks first result, or plays the url. If you want the next result use the next command.",
         "next": "Skips to the next song out of the results",
-        "song num": "Where num is the number of song you want to play. Used to play a song, to get a list of number run the previous command. For example to play song 3, run !song 3",
         "volume num":"Sets the volume of the song. Number must be a value between 1-100. Can also use shorthand of just vol.",
 
 }
+let queue = [];
 client.once('ready', () => {
 	console.log('Ready!');
         indexSongs();
@@ -74,22 +74,12 @@ function indexSongs(){
 }
 //var  globalConnection = null;
 function handleAudio(message){
-        if(message.content === options.cmndPrefix + 'song' || message.content === options.cmndPrefix + 'songs'){
-                fs.readdir(songsFolder, (err, files) => {
-                        let text = "```diff\nHere is a list of available songs:\n\n";
-        
-                        files.forEach((file, i) => {
+        if(message.content.indexOf(options.cmndPrefix + 'song') != -1 || message.content === options.cmndPrefix + 'songs' || message.content == options.cmndPrefix + 'play'){
+                sendMessage(message, "Play a song by using the command: " +  options.cmndPrefix + "play <search phrase or here>, for example to play all star from youtube the command is: " + options.cmndPrefix + "play allstar smash mouth \nUse "+options.cmndPrefix + "next to advance to the next search result.");
+        }else if(message.content.indexOf(options.cmndPrefix + 'play') != -1){
 
-                                text += (i+1) + ") " + file + "\n";
-                                songsNameMap[i+1] = file;
-
-                        });
-
-                        message.channel.send(text + "\nPlay a song by typing:\n" + options.cmndPrefix + "song num\nWhere num is the number of the song.```");
-                }); 
-        }else if(message.content.indexOf(options.cmndPrefix + 'song') != -1){
-
-                let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'song') + 4 + options.cmndPrefix.length ,  message.content.length);
+                let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'play') + 4 + options.cmndPrefix.length ,  message.content.length);
+                /*
                 if(!isNaN(indexOfSong)){
                         indexOfSong = parseInt(indexOfSong);
                         let songName  = songsNameMap[indexOfSong];
@@ -97,7 +87,7 @@ function handleAudio(message){
                         console.log("song name:" + songName);
 
                         playSong(message,songName ); 
-                }else
+                }else*/
                 if(indexOfSong.indexOf('youtube.com') !=  -1){
                         playSongUrl(message, indexOfSong);
                         request('https://noembed.com/embed?url=' + indexOfSong, { json: true }, (err, res, body) => {
