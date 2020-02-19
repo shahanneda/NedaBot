@@ -49,7 +49,33 @@ client.on('message', message => {
         handleAudio(message);
         handleVolume(message);
         handleNextSong(message);
+        handleQueue(message);
+                
 });
+function handleQueue(message){
+        if(message.content === options.cmndPrefix + "skip"){
+                nextSongFromQueue(message);
+        }
+
+        if(message.content === options.cmndPrefix + "queue" || message.content  === options.cmndPrefix + "q"){
+                let output = "These are the songs currently in your queue:\n";
+                queue.map(function(song, index){
+                      output  += (index+1) + ") " + song.title + "\n";
+                });
+                sendMessage(message, output);
+        }
+        else if(message.content.indexOf(options.cmndPrefix + "queue" ) != -1 || message.content.indexOf(options.cmndPrefix + "q") ==-1){
+        }
+        
+        if(message.content.indexOf(options.cmndPrefix + "add") != -1){
+                let searchp = message.content.substr(message.content.indexOf(options.cmndPrefix+"add") + options.cmndPrefix.length + 3, message.content.length);
+                ytSearchForSong(message, searchp, true);
+        }
+}
+function addToQueue(message, song){
+        sendMessage(message, "Added song:\n" + song.title + " to queue position " + (queue.length+1));
+        queue.push(song);
+}
 function handleHelp(message){
         let cmd = options.cmndPrefix;
         let helptext = "```diff\n Welcome to NedaBot help! Here are a list of commands:\n\n";
@@ -141,7 +167,7 @@ function handleNextSong(message){
                 ytSearchForSong(message,lastStr);
         }
 }
-function ytSearchForSong(message, str){
+function ytSearchForSong(message, str, isQueue){
         lastStr = str;
         const ytsr = require('ytsr');
         let filter;
@@ -168,8 +194,12 @@ function ytSearchForSong(message, str){
                                         ytSearchForSong(message,str);
                                         return;
                                 }
-                            sendMessage(message, "Playing " + searchResults.items[lastIndex].title);
-                        playSongUrl(message, link);
+                            if(isQueue){
+                                addToQueue(message, {title:searchResults.items[lastIndex].title, url:link});
+                            }else{
+                                sendMessage(message, "Playing " + searchResults.items[lastIndex].title);
+                                playSongUrl(message, link);
+                            }
                     });
             });
         });
@@ -224,12 +254,27 @@ function playSongUrl(message, url){
 
         const stream = ytdl(url, { filter : 'audioonly' });
         console.log("Playing song with url " + url);
-        createAudioDispatcherFromStream(clientVoiceConnection, stream);
+        createAudioDispatcherFromStream(message, clientVoiceConnection, stream);
         clientVoiceConnection.dispatcher.setVolume(songVolume);
 }
+function nextSongFromQueue(message){
+        console.log(queue);
+        console.log(queue.length);
+        if(queue.length > 0){
+                playSongUrl(message, queue[0].url);
+                sendMessage(message, "Playing next song from queue: " + queue[0].title);
+        }
+        else{
+                sendMessage(message, "Your queue is empty!! Add songs with !add <search phrase>");
+        }
+        let song = queue.shift();
 
-function createAudioDispatcherFromStream(connection, stream){
+}
+function createAudioDispatcherFromStream(message, connection, stream){
         var dispatcher = connection.playStream(stream);
+        dispatcher.on('end', () => {
+                nextSongFromQueue(message);
+        });
 }
 function createAudioDispatcher(connection, songName){
         var dispatcher = connection.playFile(songsFolder + songName);
