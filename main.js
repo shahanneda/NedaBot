@@ -76,8 +76,9 @@ function handleQueue(message){
                 let searchp = message.content.substr(message.content.indexOf(options.cmndPrefix+"add") + options.cmndPrefix.length + 3, message.content.length);
                 ytSearchForSong(message, searchp, true);
         }
-        if(message.content.indexOf(cmndPrefix + "clear") != -1){
-                sendMessage("Cleared the queue! Add new songs using " + cmndPrefix + "add <search phrase> command!";
+        if(message.content.indexOf(options.cmndPrefix + "clear") != -1){
+                sendMessage(message, "Cleared the queue! Add new songs using " + options.cmndPrefix + "add <search phrase> command!");
+                queue = [];
         }
 }
 function addToQueue(message, song){
@@ -109,8 +110,11 @@ function indexSongs(){
 //var  globalConnection = null;
 function handleAudio(message){
         if(message.content.indexOf(options.cmndPrefix + 'song') != -1 || message.content === options.cmndPrefix + 'songs' || message.content == options.cmndPrefix + 'play'){
-                sendMessage(message, "Add a song to the queue using " + options.cmndPrefix + "add <search phrase>\n\nCan also directly play a song by using the command: " +  options.cmndPrefix + "play <search phrase or here>, for example to play all star from youtube the command is: " + options.cmndPrefix + "play allstar smash mouth \nUse "+options.cmndPrefix + "next to advance to the next search result.");
-                nextSongFromQueue(message);
+                if(queue.length === 0{
+                        sendMessage(message, "Add a song to the queue using " + options.cmndPrefix + "add <search phrase>\n\nCan also directly play a song by using the command: " +  options.cmndPrefix + "play <search phrase or here>, for example to play all star from youtube the command is: " + options.cmndPrefix + "play allstar smash mouth \nUse "+options.cmndPrefix + "next to advance to the next search result.");
+                }else{
+                        nextSongFromQueue(message);
+                }
         }else if(message.content.indexOf(options.cmndPrefix + 'play') != -1){
 
                 let indexOfSong = message.content.substr(message.content.indexOf(options.cmndPrefix + 'play') + 4 + options.cmndPrefix.length ,  message.content.length);
