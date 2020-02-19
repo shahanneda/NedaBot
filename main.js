@@ -53,6 +53,7 @@ client.on('message', message => {
                 
 });
 function handleQueue(message){
+        console.log(queue);
         if(message.content === options.cmndPrefix + "skip"){
                 nextSongFromQueue(message);
         }
@@ -270,10 +271,15 @@ function nextSongFromQueue(message){
         let song = queue.shift();
 
 }
+var lastEndTime = Date.now();
 function createAudioDispatcherFromStream(message, connection, stream){
         var dispatcher = connection.playStream(stream);
         dispatcher.on('end', () => {
-                nextSongFromQueue(message);
+                console.log("Last end: " + lastEndTime);
+                lastEndTime = Date.now();
+                console.log(stream + "" + connection);
+                
+      //          nextSongFromQueue(message);
         });
 }
 function createAudioDispatcher(connection, songName){
