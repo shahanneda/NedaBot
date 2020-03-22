@@ -110,9 +110,10 @@ function indexSongs(){
 //var  globalConnection = null;
 function handleAudio(message){
         if(message.content.indexOf(options.cmndPrefix + 'song') != -1 || message.content === options.cmndPrefix + 'songs' || message.content == options.cmndPrefix + 'play'){
-                if(queue.length === 0{
+                if(queue.length === 0){
                         sendMessage(message, "Add a song to the queue using " + options.cmndPrefix + "add <search phrase>\n\nCan also directly play a song by using the command: " +  options.cmndPrefix + "play <search phrase or here>, for example to play all star from youtube the command is: " + options.cmndPrefix + "play allstar smash mouth \nUse "+options.cmndPrefix + "next to advance to the next search result.");
                 }else{
+
                         nextSongFromQueue(message);
                 }
         }else if(message.content.indexOf(options.cmndPrefix + 'play') != -1){
@@ -188,34 +189,47 @@ function ytSearchForSong(message, str, isQueue){
           if(err) throw err;
             filter = filters.get('Type').find(o => o.name === 'Video');
           ytsr.getFilters(filter.ref, function(err, filters) {
-                    if(err) throw err;
+                    if(err){
+                            handleError(message,err);
+                            return
+                    }
                     //filter = filters.get('Duration').find(o => o.name.startsWith('Short'));
+                  //
                     var options = {
                         limit: 10,
                         nextpageRef: filter.ref,
                     }
                     ytsr(null, options, function(err, searchResults) {
-                        if(err) throw err;
-                        let link = searchResults.items[lastIndex].link;
+                            if(err){
+                                    handleError(message,err);
+                                    return;
+                            }
+                            let link = searchResults.items[lastIndex].link;
+                            if(searchResults.items.length == 0){
+                                handleError(message, "No results found!!");
+                            }
                             console.log(searchResults);
-                                if(searchResults.items[lastIndex].type != 'video'){
-                                        lastIndex++; 
-                                        if(lastIndex > 9){
-                                                lastIndex =0;        
-                                        }
-                                        ytSearchForSong(message,str);
-                                        return;
-                                }
+                            if(searchResults.items[lastIndex].type != 'video'){
+                                    lastIndex++; 
+                                    if(lastIndex > 9){
+                                            lastIndex =0;        
+                                    }
+                                    ytSearchForSong(message,str);
+                                    return;
+                            }
                             if(isQueue){
-                                addToQueue(message, {title:searchResults.items[lastIndex].title, url:link});
+                                    addToQueue(message, {title:searchResults.items[lastIndex].title, url:link});
                             }else{
-                                sendMessage(message, "Playing " + searchResults.items[lastIndex].title);
-                                playSongUrl(message, link);
+                                    sendMessage(message, "Playing " + searchResults.items[lastIndex].title);
+                                    playSongUrl(message, link);
                             }
                     });
             });
         });
 
+}
+function handleError(message, err){
+                sendMessage(message, "Oh oh, Some error popped up: \n" + err);
 }
 function handleVolume(message){
         if(message.content.indexOf(options.cmndPrefix + "vol") != -1){
