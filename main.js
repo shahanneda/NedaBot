@@ -11,7 +11,8 @@ const ytsr = require('ytsr');
 
 let options  = {
         sayEntirePhrase: true,
-        profanityAllowed: false,
+        profanityAllowed: true,
+        checkForIm: true,
         testOption: false,
         testOption: true,
         cmndPrefix: "!"
@@ -54,8 +55,19 @@ client.on('message', message => {
         handleVolume(message);
         handleNextSong(message);
         handleQueue(message);
+        handleSmileyFace(message);
                 
 });
+function handleSmileyFace(message){
+        let listOfFaces = ["ʘ‿ʘ","ʕ•ᴥ•ʔ","ʕᵔᴥᵔʔ","(｡◕‿◕｡)","☜(⌒▽⌒)☞","ಠ‿ಠ","\\(ᵔᵕᵔ)/"] 
+        let listOfStarts = ["🙂", ":)", ":9", "😦", ":<","xD", "xd", "XD",":laughing:","😢" ];
+        listOfStarts.map(function(c){
+                if(message.content.indexOf(c) != -1){
+                        message.channel.send(listOfFaces[Math.floor(Math.random() * listOfFaces.length)] ) ;
+                }
+                return;
+        })
+}
 function handleQueue(message){
         console.log(queue);
         if(message.content === options.cmndPrefix + "skip"){
@@ -379,6 +391,9 @@ function handlePingPong(message){
 }
 
 function handleHiIAm(message){
+        if(!options.checkForIm){
+                return;
+        }
         let formatedMsg = message.content.toLowerCase();
         
         let triggerPhrases = ["im ", "i'm ","i’m ", "i am ", "i am a ", "im a ", "i'm a ", "i’m a " , "im so ", "i'm so ", "i’m so ", "i am so ", "i am a complete ", "im a complete ","i'm a complete ", "i’m a complete ", "im an " , "i am an " , "i'm an ", "i’m an "];
@@ -403,7 +418,7 @@ function handleHiIAm(message){
 }
 function sendHiMessage(messageObject, name){
         name = setCharAt(name, 0, name.charAt(0).toString().toUpperCase());
-        let endPhrases = ["I'm NedaBot!", "I am NedaBot! Nice to meet you!", "Nice to meet you, I am NedaBot", "I am THE NEDABOT","Have we met before? Well anyway I am NedaBot.",  "It's a pleasure to work with you!!"];
+        let endPhrases = ["I'm NedaBot!", "I am NedaBot! Nice to meet you!", "Nice to meet you, I am NedaBot", "I am THE NEDABOT","Have we met before? Well anyways I am NedaBot.",  "It's a pleasure to work with you!!", "I am glad that I have met you, I am NedaBot!", "I am known around here as NedaBot."];
         
         messageObject.channel.send("Hi "  +  name +"\n" + endPhrases[Math.floor(Math.random() * endPhrases.length)]);
 
