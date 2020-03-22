@@ -17,6 +17,19 @@ let options  = {
         testOption: true,
         cmndPrefix: "!"
 }
+var stdin = process.openStdin();
+
+stdin.addListener("data", function(d) {
+        let mes  = d.toString().trim();
+        let number = mes.split(" ")[0];
+        if(isNaN(number)){
+                console.log("Please enter channel number at the start of your message!!!");
+                return;
+        }
+        if(client.channels.get(number)){
+                client.channels.get(number).send(mes.substr(number.length));
+        }
+  });
 let songVolume = 1;
 let  commandList = {
         "join": "Joins the voice channel of the user, use this when wanting to play music. Firstly join the intended voice channel yourself, then run this command.",
