@@ -8,6 +8,8 @@ const songsFolder = auth.songDirectory;
 const ytdl = require('ytdl-core');
 const request = require('request');
 const ytsr = require('ytsr');
+const { get } = require("snekfetch");
+
 
 let options  = {
         sayEntirePhrase: true,
@@ -15,7 +17,7 @@ let options  = {
         checkForIm: true,
         testOption: false,
         testOption: true,
-        cmndPrefix: "!"
+        cmndPrefix: "$"
 }
 var stdin = process.openStdin();
 
@@ -69,13 +71,27 @@ client.on('message', message => {
         handleNextSong(message);
         handleQueue(message);
         handleSmileyFace(message);
+        handleCats(message);
                 
 });
+
+function handleCats(message){
+        if(message.content.indexOf("cat") != -1){
+                let name = message.guild.members.get(message.author.id).displayName;
+                get('https://cataas.com/cat/cute/says/Hi-' + name).then(res => {
+                        console.log(res.body);
+                        message.channel.send("", {
+                                file: res.body
+                        });
+                });
+        }
+
+}
 function handleSmileyFace(message){
         let listOfFaces = ["ʘ‿ʘ","ʕ•ᴥ•ʔ","ʕᵔᴥᵔʔ","(｡◕‿◕｡)","☜(⌒▽⌒)☞","ಠ‿ಠ","\\(ᵔᵕᵔ)/"] 
-        let listOfStarts = ["🙂", ":)", ":9", "😦", ":<","xD", "xd", "XD",":laughing:","😢" ];
+        let listOfStarts = ["🙂", ":)", ":9", "😦", ":<","xD", "xd", "XD",":laughing:","😢", "uwu", "owo" ];
         listOfStarts.map(function(c){
-                if(message.content.indexOf(c) != -1){
+                if(message.content.toLowerCase().indexOf(c) != -1){
                         message.channel.send(listOfFaces[Math.floor(Math.random() * listOfFaces.length)] ) ;
                 }
                 return;
@@ -120,7 +136,7 @@ function handleHelp(message){
                 }
         }
         helptext += "!options\n\tUsed to get a list of the options and instructions for setting them\n```"
-        if(message.content == options.cmndPrefix + "help"){
+        if(message.content == options.cmndPrefix + "help"   ){
                 message.channel.send(helptext);
         }
 
@@ -326,7 +342,6 @@ var lastEndTime = new Date().getTime();
 function createAudioDispatcherFromStream(message, connection, stream){
         var dispatcher = connection.playStream(stream);
         dispatcher.on('end', () => {
-                sendMessage(message, "SONG ENDED");
                 console.log("Last end: " + ( new Date().getTime() -  lastEndTime));
                 lastEndTime = new Date().getTime();
                 console.log(stream + "" + connection);
