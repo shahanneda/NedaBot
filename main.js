@@ -17,6 +17,7 @@ let options  = {
         checkForIm: true,
         testOption: false,
         testOption: true,
+        cats: true,
         cmndPrefix: "$"
 }
 var stdin = process.openStdin();
@@ -76,7 +77,7 @@ client.on('message', message => {
 });
 
 function handleCats(message){
-        if(message.content.indexOf("cat") != -1){
+        if(message.content.toLowerCase().indexOf("cat") != -1 && options.cats){
                 let name = message.guild.members.get(message.author.id).displayName;
                 get('https://cataas.com/cat/cute/says/Hi-' + name).then(res => {
                         console.log(res.body);
@@ -88,7 +89,7 @@ function handleCats(message){
 
 }
 function handleSmileyFace(message){
-        let listOfFaces = ["ʘ‿ʘ","ʕ•ᴥ•ʔ","ʕᵔᴥᵔʔ","(｡◕‿◕｡)","☜(⌒▽⌒)☞","ಠ‿ಠ","\\(ᵔᵕᵔ)/"] 
+        let listOfFaces = ["ʘ‿ʘ","ʕ•ᴥ•ʔ","ʕᵔᴥᵔʔ","(｡◕‿◕｡)","☜(⌒▽⌒)☞","ಠ‿ಠ","\\(ᵔᵕᵔ)/", "•ᴥ•"] 
         let listOfStarts = ["🙂", ":)", ":9", "😦", ":<","xD", "xd", "XD",":laughing:","😢", "uwu", "owo" ];
         listOfStarts.map(function(c){
                 if(message.content.toLowerCase().indexOf(c) != -1){
