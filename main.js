@@ -13,7 +13,7 @@ const { get } = require("snekfetch");
 
 let options  = {
         sayEntirePhrase: true,
-        profanityAllowed: true,
+        profanityAllowed: false,
         checkForIm: true,
         testOption: false,
         testOption: true,
