@@ -13,7 +13,7 @@ const { get } = require("snekfetch");
 
 let options  = {
         sayEntirePhrase: true,
-        profanityAllowed: false,
+        profanityAllowed: true,
         checkForIm: true,
         testOption: false,
         testOption: true,
@@ -44,6 +44,7 @@ let  commandList = {
         "clear":"Clears the queue",
         "skip":"Skips to the next song in the queue",
         "volume num":"Sets the volume of the song. Number must be a value between 1-100. Can also use shorthand of just vol.",
+        "joke":"Sends a Joke.",
 
 }
 let queue = [];
@@ -73,6 +74,7 @@ client.on('message', message => {
         handleQueue(message);
         handleSmileyFace(message);
         handleCats(message);
+        handleJoke(message);
                 
 });
 
@@ -88,6 +90,19 @@ function handleCats(message){
         }
 
 }
+function handleJoke(message){
+  if(message.content.toLowerCase().indexOf(options.cmndPrefix + "joke") == -1){
+    return;
+  }
+
+  get("https://official-joke-api.appspot.com/random_joke").then(res => {
+    console.log(res.body);
+    message.channel.send("** " + res.body.setup + " **" + "\n" + res.body.punchline);
+    // message.channel.send("*Here is a " + res.body.type  + " joke:* \n" + "** " + res.body.setup + " **" + "\n" + res.body.punchline);
+
+  });
+
+};
 function handleSmileyFace(message){
         let listOfFaces = ["ʘ‿ʘ","ʕ•ᴥ•ʔ","ʕᵔᴥᵔʔ","(｡◕‿◕｡)","☜(⌒▽⌒)☞","ಠ‿ಠ","\\(ᵔᵕᵔ)/", "•ᴥ•"] 
         let listOfStarts = ["🙂", ":)", ":9", "😦", ":<","xD", "xd", "XD",":laughing:","😢", "uwu", "owo" ];
@@ -143,11 +158,11 @@ function handleHelp(message){
 
 }
 function indexSongs(){
-        fs.readdir(songsFolder, (err, files) => {
-                files.forEach((file, i) => {
-                        songsNameMap[i+1] = file;
-                });
-        }); 
+        // fs.readdir(songsFolder, (err, files) => {
+        //         files.forEach((file, i) => {
+        //                 songsNameMap[i+1] = file;
+        //         });
+        // }); 
 }
 //var  globalConnection = null;
 function handleAudio(message){
