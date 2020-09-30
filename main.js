@@ -14,9 +14,7 @@ const { get } = require("snekfetch");
 let options  = {
         sayEntirePhrase: true,
         profanityAllowed: true,
-        checkForIm: true,
-        testOption: false,
-        testOption: true,
+        checkForIm: false,
         cats: true,
         cmndPrefix: "$"
 }
@@ -141,6 +139,10 @@ function handleQueue(message){
 function addToQueue(message, song){
         sendMessage(message, "Added song:\n" + song.title + " to queue position " + (queue.length+1));
         queue.push(song);
+        if(queue.length == 1){
+          nextSongFromQueue(message);
+
+        }
 }
 function handleHelp(message){
         let cmd = options.cmndPrefix;
@@ -203,9 +205,7 @@ function handleAudio(message){
               message.member.voiceChannel.join()
                 .then(connection => {
                   sendMessage(message, 'I have connected to the voice Channel');
-                         //createAudioDispatcher(connection);
-                        //
-                        playSong(message,"chopin.mp3");
+                       //createAudioDispatcher(connection);
                        // globalConnection = connection;
                 })
                 .catch(console.log);
@@ -239,6 +239,11 @@ function handleNextSong(message){
         }
 }
 function ytSearchForSong(message, str, isQueue){
+        if(str.trim() == ""){
+          sendMessage(message, "Add a song to queue with " + options.cmndPrefix + "add <search phrase>");
+          return;
+        }
+        sendMessage(message, "Searching for song \"" + str.trim() + "\" on youtube");
         lastStr = str;
         let filter;
 
@@ -350,7 +355,7 @@ function nextSongFromQueue(message){
                 let song = queue.shift();
         }
         else{
-                sendMessage(message, "Your queue is empty!! Add songs with !add <search phrase>");
+                sendMessage(message, "Your queue is empty!! Add songs with "+ options.cmndPrefix + "add <search phrase>");
         }
 
 }
@@ -367,19 +372,20 @@ function createAudioDispatcherFromStream(message, connection, stream){
         });
 }
 function createAudioDispatcher(connection, songName){
-        var dispatcher = connection.playFile(songsFolder + songName);
-        dispatcher.on('end', () => {
-                dispatcher = connection.playFile(songsFolder + songName);
-        });
-
-        dispatcher.on('error', e => {
-                console.log(e);
-        });
-
-        dispatcher.setVolume(0.5);
-        dispatcher.setVolume(1); 
-
-        console.log(dispatcher.time);
+        // Old System for playing from files
+        // var dispatcher = connection.playFile(songsFolder + songName);
+        // dispatcher.on('end', () => {
+        //         dispatcher = connection.playFile(songsFolder + songName);
+        // });
+        //
+        // dispatcher.on('error', e => {
+        //         console.log(e);
+        // });
+        //
+        // dispatcher.setVolume(0.5);
+        // dispatcher.setVolume(1); 
+        //
+        // console.log(dispatcher.time);
 }
 function sendMessage(message, msg){
         message.channel.send("```css\n" + msg + "```");
