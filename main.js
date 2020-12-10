@@ -82,11 +82,12 @@ client.on('message', message => {
 });
 
 function handleAutoComp(message){
-  let index = message.content.toLowerCase().indexOf("nedabot");
+  let trigger = "nedabot continue:";
+  let index = message.content.toLowerCase().indexOf(trigger);
   if(index == -1){
     return;
   }
-  let text = message.content.substr(index + 7);
+  let text = message.content.substr(trigger.length);
   if(text.length <= 0){
     return;
   }
@@ -100,10 +101,16 @@ function handleAutoComp(message){
       var resp = await deepai.callStandardApi("text-generator", {
         text: text,
       });
+
       console.log("the answer is: ", resp);
-      sendMessage(message, resp.output);
+
+      // fix issue with output being too long sometimes
+      var trimmedString = resp.output.length > 1800 ? resp.output.substr(0, 1800) : resp.output;
+      sendMessage(message, trimmedString);
+      console.log(trimmedString.length);
     }catch(error){
       console.log(error);
+      sendMessage(message, "an error has occured, please try another input");
     }
   })()
 }
