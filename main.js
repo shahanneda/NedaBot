@@ -25,10 +25,10 @@ deepai.setApiKey(auth.DEEPAI_KEY);
 
 stdin.addListener("data", function (d) {
   let mes = d.toString().trim();
-  let ds = mes.split(" ")[0];
-  let number = mes.split(" ")[1];
+  let ds = mes.split("_")[0];
+  let number = mes.split("_")[1].split(" ")[0];
   if (isNaN(number)) {
-    console.log("Please enter  s/d <space> channel number/user id at the start of your message!!!");
+    console.log("Please enter  <s/d>_<server channel number/direct user id> at the start of your message!!!");
     return;
   }
   if(ds =="s"){
@@ -73,7 +73,14 @@ client.on('message', message => {
   }
 
   handleOptions(message);
-  console.log(message.content);
+  console.log("\n\n---------------------\nNEW MESSAGE FROM: ", message.author.username,);
+  if(message.channel.type=="dm"){
+    console.log( "ID: d_" + message.author.id, "\nDM Message");
+  }else{
+    console.log( "ID: s_" + message.channel.id, "\nIn Server:", message.channel.guild.name);
+  }
+  console.log("----BEGIN MESSAGE----\n"+ message.content, "\n---------END---------\n");
+
   handlePingPong(message);
   handleHiIAm(message);
   handleHelp(message);
