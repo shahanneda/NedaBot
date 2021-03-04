@@ -25,14 +25,22 @@ deepai.setApiKey(auth.DEEPAI_KEY);
 
 stdin.addListener("data", function (d) {
   let mes = d.toString().trim();
-  let number = mes.split(" ")[0];
+  let ds = mes.split(" ")[0];
+  let number = mes.split(" ")[1];
   if (isNaN(number)) {
-    console.log("Please enter channel number at the start of your message!!!");
+    console.log("Please enter  s/d <space> channel number/user id at the start of your message!!!");
     return;
   }
-  if (client.channels.get(number)) {
-    client.channels.get(number).send(mes.substr(number.length));
+  if(ds =="s"){
+    if (client.channels.get(number)) {
+      client.channels.get(number).send(mes.substr(number.length + 2));
+    }
+  }else{
+    client.fetchUser(number, false).then((user) => {
+      user.send(mes.substr(number.length + 2));
+     });
   }
+
 });
 let songVolume = 1;
 let commandList = {
